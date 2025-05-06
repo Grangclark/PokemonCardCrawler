@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CoreData
 
 struct CardData {
     let cardID: String

@@ -6,23 +6,10 @@
 //
 
 import SwiftUI
-
-/*
-struct CardDetailView: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
-    }
-}
-
-struct CardDetailView_Previews: PreviewProvider {
-    static var previews: some View {
-        CardDetailView()
-    }
-}
-*/
+import CoreData
 
 struct CardDetailView: View {
-    let card: Card
+    let card: PokemonCardCrawler.CDPokemonCard
     @State private var cardImage: NSImage?
     
     var body: some View {
@@ -43,7 +30,7 @@ struct CardDetailView: View {
                 
                 VStack(alignment: .leading, spacing: 15) {
                     Group {
-                        Text(card.name ?? "不明なカード")
+                        Text(card.name)
                             .font(.title)
                             .bold()
                         
@@ -106,7 +93,7 @@ struct CardDetailView: View {
             }
             .padding()
         }
-        .navigationTitle(card.name ?? "カード詳細")
+        .navigationTitle(card.name)
         .onAppear(perform: loadCardImage)
     }
     
@@ -122,7 +109,8 @@ struct CardDetailView: View {
     }
     
     private func loadCardImage() {
-        guard cardImage == nil, let imageURL = card.imageURL, let url = URL(string: imageURL) else {
+        // guard cardImage == nil, let imageURL = card.imageURL, let url = URL(string: imageURL) else {
+        guard cardImage == nil, !card.imageURL.isEmpty, let url = URL(string: card.imageURL) else {
             return
         }
         

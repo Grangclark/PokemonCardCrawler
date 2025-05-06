@@ -6,20 +6,6 @@
 //
 
 import SwiftUI
-/*
-struct DeckView: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
-    }
-}
-
-struct DeckView_Previews: PreviewProvider {
-    static var previews: some View {
-        DeckView()
-    }
-}
-*/
-
 import CoreData
 
 struct DeckView: View {
@@ -96,8 +82,8 @@ struct DeckView: View {
         }
     }
     
-    private func fetchCards(for cardIDs: [String]) -> [Card] {
-        let fetchRequest: NSFetchRequest<Card> = Card.fetchRequest()
+    private func fetchCards(for cardIDs: [String]) -> [PokemonCardCrawler.CDPokemonCard] {
+        let fetchRequest: NSFetchRequest<PokemonCardCrawler.CDPokemonCard> = PokemonCardCrawler.CDPokemonCard.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "cardID IN %@", cardIDs)
         
         do {
@@ -112,7 +98,7 @@ struct DeckView: View {
             }
             
             // カードをデッキリストの順序に並べ替え
-            var orderedCards: [Card] = []
+            var orderedCards: [PokemonCardCrawler.CDPokemonCard] = []
             for id in cardIDs {
                 if let card = cards.first(where: { $0.cardID == id }) {
                     orderedCards.append(card)

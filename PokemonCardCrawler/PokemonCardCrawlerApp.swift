@@ -6,53 +6,7 @@
 //
 
 import SwiftUI
-
-/*
-@main
-struct PokemonCardCrawlerApp: App {
-    let persistenceController = PersistenceController.shared
-
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
-        }
-    }
-}
-*/
-
-/*
-@main
-struct PokemonCardCrawlerApp: App {
-    let persistenceController = PersistenceController.shared
-
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                .frame(minWidth: 800, minHeight: 600)
-        }
-        .commands {
-            CommandGroup(replacing: .newItem) {
-                Button("クローリング開始") {
-                    NotificationCenter.default.post(name: .startCrawling, object: nil)
-                }
-                .keyboardShortcut("R", modifiers: [.command, .shift])
-                
-                Button("データベースをクリア") {
-                    NotificationCenter.default.post(name: .clearDatabase, object: nil)
-                }
-                .keyboardShortcut("K", modifiers: [.command, .shift])
-            }
-        }
-    }
-}
-
-extension Notification.Name {
-    static let startCrawling = Notification.Name("startCrawling")
-    static let clearDatabase = Notification.Name("clearDatabase")
-}
-*/
+import CoreData
 
 // アプリのメインエントリポイントを更新 (PokemonCardCrawlerApp.swift)
 @main

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CoreData
 
 extension Notification.Name {
     static let startCrawling = Notification.Name("startCrawling")

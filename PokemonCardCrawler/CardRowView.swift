@@ -6,23 +6,10 @@
 //
 
 import SwiftUI
-
-/*
-struct CardRowView: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
-    }
-}
-
-struct CardRowView_Previews: PreviewProvider {
-    static var previews: some View {
-        CardRowView()
-    }
-}
-*/
+import CoreData
 
 struct CardRowView: View {
-    let card: Card
+    let card: CDPokemonCard
     @State private var cardImage: NSImage?
     
     var body: some View {
@@ -40,11 +27,11 @@ struct CardRowView: View {
             }
             
             VStack(alignment: .leading) {
-                Text(card.name ?? "不明なカード")
+                Text(card.name)
                     .font(.headline)
                 
                 HStack {
-                    Text(card.cardID ?? "")
+                    Text(card.cardID)
                         .font(.caption)
                         .foregroundColor(.secondary)
                     
@@ -67,7 +54,8 @@ struct CardRowView: View {
     }
     
     private func loadCardImage() {
-        guard cardImage == nil, let imageURL = card.imageURL, let url = URL(string: imageURL) else {
+        // guard cardImage == nil, let imageURL = card.imageURL, let url = URL(string: imageURL) else {
+        guard cardImage == nil, !card.imageURL.isEmpty, let url = URL(string: card.imageURL) else {
             return
         }
         

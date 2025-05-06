@@ -44,19 +44,19 @@ class CrawlerViewModel: ObservableObject {
         context.perform {
             for data in cardData {
                 // 既存のカードを検索
-                let fetchRequest: NSFetchRequest<Card> = Card.fetchRequest()
+                let fetchRequest: NSFetchRequest<PokemonCardCrawler.CDPokemonCard> = PokemonCardCrawler.CDPokemonCard.fetchRequest()
                 fetchRequest.predicate = NSPredicate(format: "cardID == %@", data.cardID)
                 
                 do {
                     let existingCards = try context.fetch(fetchRequest)
-                    let card: Card
+                    let card: CDPokemonCard
                     
                     if let existingCard = existingCards.first {
                         // 既存のカードを更新
                         card = existingCard
                     } else {
                         // 新しいカードを作成
-                        card = Card(context: context)
+                        card = CDPokemonCard(context: context)
                     }
                     
                     // データを設定
