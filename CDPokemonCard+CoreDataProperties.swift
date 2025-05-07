@@ -14,10 +14,6 @@ extension CDPokemonCard {
         return NSFetchRequest<CDPokemonCard>(entityName: "CDPokemonCard")
     }
 
-    // @NSManaged public var cardID: String?
-    // @NSManaged public var name: String?
-    // @NSManaged public var imageURL: String?
-    // @NSManaged public var pageURL: String?
     // 他のプロパティも同様に定義
     @NSManaged public var cardID: String
     @NSManaged public var name: String
