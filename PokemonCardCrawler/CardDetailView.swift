@@ -52,7 +52,8 @@ struct CardDetailView: View {
                             detailRow(title: "タイプ", value: cardType)
                         }
                         
-                        if let hp = card.hp, hp > 0 {
+                        // if let hp = card.hp, hp > 0 {
+                        if let hp = card.hp?.intValue, hp > 0 {
                             detailRow(title: "HP", value: "\(hp)")
                         }
                     }
@@ -78,7 +79,8 @@ struct CardDetailView: View {
                             detailRow(title: "抵抗力", value: resistance)
                         }
                         
-                        if let retreatCost = card.retreatCost, retreatCost > 0 {
+                        // if let retreatCost = card.retreatCost, retreatCost > 0 {
+                        if let retreatCost = card.retreatCost?.intValue, retreatCost > 0 {
                             detailRow(title: "逃げるコスト", value: "\(retreatCost)")
                         }
                     }

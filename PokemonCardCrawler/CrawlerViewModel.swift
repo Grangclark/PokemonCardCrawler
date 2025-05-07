@@ -67,13 +67,15 @@ class CrawlerViewModel: ObservableObject {
                     card.expansion = data.expansion
                     card.rarity = data.rarity
                     card.cardType = data.cardType
-                    card.hp = Int16(data.hp ?? 0)
+                    // card.hp = Int16(data.hp ?? 0)
+                    card.hp = data.hp != nil ? NSNumber(value: Int16(data.hp!)) : NSNumber(value: 0)
                     card.attack1 = data.attack1
                     card.attack2 = data.attack2
                     card.ability = data.ability
                     card.weakness = data.weakness
                     card.resistance = data.resistance
-                    card.retreatCost = Int16(data.retreatCost ?? 0)
+                    // card.retreatCost = Int16(data.retreatCost ?? 0)
+                    card.retreatCost = data.retreatCost != nil ? NSNumber(value: Int16(data.retreatCost!)) : NSNumber(value: 0)
                     card.timestamp = Date()
                 } catch {
                     print("保存エラー: \(error)")
