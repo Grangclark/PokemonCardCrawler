@@ -21,6 +21,9 @@ struct PokemonCardCrawlerApp: App {
                 .onAppear {
                     // macOSのウィンドウサイズを設定
                     NSApp.windows.first?.setFrame(NSRect(x: 0, y: 0, width: 1000, height: 700), display: true)
+                    
+                    // アプリ起動時に初期データをチェック
+                    persistenceController.insertSampleDataIfNeeded()
                 }
         }
         .windowStyle(HiddenTitleBarWindowStyle())

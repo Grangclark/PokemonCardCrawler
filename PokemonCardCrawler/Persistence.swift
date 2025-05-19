@@ -6,7 +6,65 @@
 //
 
 import CoreData
+import SwiftUI
 
+struct PersistenceController {
+    // 共有インスタンス
+    static let shared = PersistenceController()
+    
+    // Core Dataコンテナ
+    let container: NSPersistentContainer
+    let backgroundContext: NSManagedObjectContext
+    
+    // 初期化
+    init() {
+        // モデル名を正しく指定する
+        container = NSPersistentContainer(name: "PokemonCardCrawler")
+        
+        container.loadPersistentStores { description, error in
+            if let error = error as NSError? {
+                fatalError("Core Dataストアの読み込みに失敗: \(error), \(error.userInfo)")
+            }
+        }
+        
+        container.viewContext.automaticallyMergesChangesFromParent = true
+        container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+        
+        backgroundContext = container.newBackgroundContext()
+        backgroundContext.automaticallyMergesChangesFromParent = true
+        backgroundContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+    }
+    
+    // サンプルデータの挿入
+    func insertSampleDataIfNeeded() {
+        let context = container.viewContext
+        let fetchRequest = NSFetchRequest<CDPokemonCard>(entityName: "CDPokemonCard")
+        
+        do {
+            let count = try context.count(for: fetchRequest)
+            print("既存のカード数: \(count)")
+            
+            if count == 0 {
+                print("サンプルデータを挿入します")
+                // サンプルデータを追加
+                let newCard = CDPokemonCard(context: context)
+                newCard.name = "ピカチュウ"
+                newCard.cardID = "001/xxx"
+                newCard.expansion = "基本セット"
+                newCard.hp = NSNumber(value: 70)
+                newCard.cardType = "でんき"
+                newCard.attack1 = "10ボルト"
+                
+                try context.save()
+                print("サンプルデータを保存しました")
+            }
+        } catch {
+            print("データチェックエラー: \(error)")
+        }
+    }
+}
+
+/*
 struct PersistenceController {
     static let shared = PersistenceController()
 
@@ -35,6 +93,7 @@ struct PersistenceController {
         backgroundContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
     }
 }
+*/
 
 // PokemonCardCrawler.xcdatamodeld
 // CoreDataモデルは以下の属性を持つEntityを作成します
