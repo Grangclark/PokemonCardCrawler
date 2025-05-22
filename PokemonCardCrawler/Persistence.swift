@@ -48,13 +48,24 @@ struct PersistenceController {
                 print("サンプルデータを挿入します")
                 // サンプルデータを追加
                 let newCard = CDPokemonCard(context: context)
-                newCard.name = "ピカチュウ"
-                newCard.cardID = "001/xxx"
-                newCard.expansion = "基本セット"
-                newCard.hp = NSNumber(value: 70)
+                // non optional
+                newCard.name = "ピカチュウex"
+                newCard.cardID = "033/106"
+                newCard.imageURL = "https://www.pokemon-card.com/assets/images/card_images/large/SV8/046373_P_PIKACHIXYUUEX.jpg"
+                newCard.pageURL = "https://www.pokemon-card.com/card-search/details.php/card/46373/regu/XY"
+
+                // optional
+                newCard.ability = "がんばりハート"
+                newCard.attack1 = "トパーズボルト"
+                newCard.attack2 = ""
                 newCard.cardType = "でんき"
-                newCard.attack1 = "10ボルト"
-                
+                newCard.expansion = "超電ブレイカー"
+                newCard.hp = NSNumber(value: 200)
+                newCard.rarity = "RR"
+                newCard.resistance = ""
+                newCard.retreatCost = NSNumber(value: 1)
+                newCard.weakness = "かくとう"
+                 
                 try context.save()
                 print("サンプルデータを保存しました")
             }
@@ -63,37 +74,6 @@ struct PersistenceController {
         }
     }
 }
-
-/*
-struct PersistenceController {
-    static let shared = PersistenceController()
-
-    let container: NSPersistentContainer
-    let backgroundContext: NSManagedObjectContext
-
-    init(inMemory: Bool = false) {
-        // "PokemonCardModel"を"PokemonCardCrawler"に変更
-        container = NSPersistentContainer(name: "PokemonCardCrawler")
-        
-        if inMemory {
-            container.persistentStoreDescriptions.first?.url = URL(fileURLWithPath: "/dev/null")
-        }
-        
-        container.loadPersistentStores { description, error in
-            if let error = error {
-                fatalError("CoreDataコンテナの読み込みエラー: \(error)")
-            }
-        }
-        
-        container.viewContext.automaticallyMergesChangesFromParent = true
-        container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-        
-        backgroundContext = container.newBackgroundContext()
-        backgroundContext.automaticallyMergesChangesFromParent = true
-        backgroundContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-    }
-}
-*/
 
 // PokemonCardCrawler.xcdatamodeld
 // CoreDataモデルは以下の属性を持つEntityを作成します
