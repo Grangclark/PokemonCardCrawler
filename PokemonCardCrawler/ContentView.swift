@@ -70,6 +70,13 @@ struct ContentView: View {
                     Label("デッキ", systemImage: "list.bullet")
                 }
                 .tag(1)
+            
+            // 新しいタブを追加
+            SingleCardCrawlerView()
+                .tabItem {
+                    Label("カード追加", systemImage: "plus.circle")
+                }
+                .tag(2)
         }
         .overlay(
             ZStack {
