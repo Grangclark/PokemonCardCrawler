@@ -53,7 +53,8 @@ class SingleCardCrawler {
             
             // HTMLを解析してカード情報を抽出
             do {
-                let cardInfo = try self.parseCardHTML(html)
+                // let cardInfo = try self.parseCardHTML(html)
+                let cardInfo = try self.parseCardHTML(html, url: url.absoluteString) // URL引数を追加
                 
                 // Core Dataに保存
                 context.perform {
@@ -88,18 +89,131 @@ class SingleCardCrawler {
         }.resume()
     }
     
-    private func parseCardHTML(_ html: String) throws -> CardInfo {
+    private func parseCardHTML(_ html: String, url: String) throws -> CardInfo {
         // HTMLパース処理をここに実装
         // 既存のクローラーコードを参考に、1枚分の処理を行う
+        
+        // カードIDの抽出（例：001/165）
+        let cardIDPattern = #"<span[^>]*class=".*cardNumber.*"[^>]*>(.*?)</span>"#
+        let cardID = extractValue(from: html, pattern: cardIDPattern) ?? "000/000"
+        
+        // カード名の抽出
+        let namePattern = #"<h1[^>]*class=".*cardName.*"[^>]*>(.*?)</h1>"#
+        let name = extractValue(from: html, pattern: namePattern) ?? "不明なカード"
+        
+        // 画像URLの抽出
+        let imageURLPattern = #"<img[^>]*class=".*cardImage.*"[^>]*src="([^"]*)"#
+        let imageURL = extractValue(from: html, pattern: imageURLPattern) ?? ""
+
+        // pageURLは引数として渡されたURLをそのまま使用
+        // let pageURL = url // crawlSingleCard関数の引数として渡されたURL
+        
+        // 拡張パック名の抽出
+        let expansionPattern = #"<span[^>]*class=".*expansionPack.*"[^>]*>(.*?)</span>"#
+        let expansion = extractValue(from: html, pattern: expansionPattern) ?? "不明な拡張パック"
+        
+        // レアリティの抽出
+        let rarityPattern = #"<span[^>]*class=".*rarity.*"[^>]*>(.*?)</span>"#
+        let rarity = extractValue(from: html, pattern: rarityPattern) ?? ""
+        
+        // タイプの抽出
+        let typePattern = #"<span[^>]*class=".*type.*"[^>]*>(.*?)</span>"#
+        let cardType = extractValue(from: html, pattern: typePattern) ?? "ノーマル"
+        
+        // HPの抽出
+        let hpPattern = #"<span[^>]*class=".*hp.*"[^>]*>.*?(\d+)</span>"#
+        let hpString = extractValue(from: html, pattern: hpPattern) ?? "0"
+        let hp = Int(hpString) ?? 0
+        
+        // 技1の抽出
+        let attack1Pattern = #"<div[^>]*class=".*attack.*"[^>]*>.*?<span[^>]*class=".*attackName.*"[^>]*>(.*?)</span>"#
+        let attack1 = extractValue(from: html, pattern: attack1Pattern) ?? ""
+        
+        // 技2の抽出（複数の技がある場合）
+        let attack2Pattern = #"<div[^>]*class=".*attack.*"[^>]*>.*?<div[^>]*class=".*attack.*"[^>]*>.*?<span[^>]*class=".*attackName.*"[^>]*>(.*?)</span>"#
+        let attack2 = extractValue(from: html, pattern: attack2Pattern) ?? ""
+        
+        // 特性の抽出
+        let abilityPattern = #"<span[^>]*class=".*ability.*"[^>]*>(.*?)</span>"#
+        let ability = extractValue(from: html, pattern: abilityPattern) ?? ""
+        
+        // 弱点の抽出
+        let weaknessPattern = #"<span[^>]*class=".*weakness.*"[^>]*>(.*?)</span>"#
+        let weakness = extractValue(from: html, pattern: weaknessPattern) ?? ""
+        
+        // 抵抗力の抽出
+        let resistancePattern = #"<span[^>]*class=".*resistance.*"[^>]*>(.*?)</span>"#
+        let resistance = extractValue(from: html, pattern: resistancePattern) ?? ""
+        
+        // 逃げるエネルギーの抽出
+        let retreatPattern = #"<span[^>]*class=".*retreat.*"[^>]*>.*?(\d+)"#
+        let retreatString = extractValue(from: html, pattern: retreatPattern) ?? "0"
+        let retreatCost = Int(retreatString) ?? 0
+        
+        /*
+        // 進化段階の抽出
+        let evolutionPattern = #"<span[^>]*class=".*evolution.*"[^>]*>(.*?)</span>"#
+        let evolution = extractValue(from: html, pattern: evolutionPattern) ?? ""
+        */
+
+        print("パース結果:")
+        print("カードID: \(cardID)")
+        print("名前: \(name)")
+        print("拡張パック: \(expansion)")
+        print("レアリティ: \(rarity)")
+        print("タイプ: \(cardType)")
+        print("HP: \(hp)")
+        print("技1: \(attack1)")
+        print("技2: \(attack2)")
+        print("特性: \(ability)")
+        print("弱点: \(weakness)")
+        print("抵抗力: \(resistance)")
+        print("逃げるコスト: \(retreatCost)")
+        
+        /*
+        return CardInfo(
+            name: name,
+            cardID: cardID,
+            expansion: expansion,
+            hp: hp,
+            cardType: cardType,
+            attack1: attack1,
+            attack2: attack2,
+            // evolution: evolution,
+            rarity: rarity,
+            retreatCost: retreatCost,
+            weakness: weakness,
+            resistance: resistance
+        )
+         */
+        
+        return CardInfo(
+            cardID: cardID,
+            name: name,
+            imageURL: imageURL,
+            pageURL: url, // 引数として受け取ったURLを設定
+            expansion: expansion,
+            rarity: rarity,
+            cardType: cardType,
+            hp: hp,
+            attack1: attack1,
+            attack2: attack2,
+            ability: ability,
+            weakness: weakness,
+            resistance: resistance,
+            retreatCost: retreatCost
+        )
         
         // HTMLから必要な情報を抽出する処理
         // 正規表現やSwiftSoupを使用してパース
         
+        /*
+         // サンプルなので消すな
         return CardInfo(
             cardID: "033/106",
             name: "ピカチュウex",
-            imageURL: "https://www.pokemon-card.com/card-search/details.php/card/46373/regu/XY",
-            pageURL: "https://www.pokemon-card.com/assets/images/card_images/large/SV8/046373_P_PIKACHIXYUUEX.jpg",
+            pageURL: "https://www.pokemon-card.com/card-search/details.php/card/46373/regu/XY",
+            imageURL: "https://www.pokemon-card.com/assets/images/card_images/large/SV8/046373_P_PIKACHIXYUUEX.jpg",
             expansion: "超電ブレイカー",
             rarity: "RR",
             cardType: "でんき",
@@ -111,7 +225,38 @@ class SingleCardCrawler {
             resistance: "",
             retreatCost: 1
         )
+         */
     }
+}
+
+// 正規表現を使って値を抽出するヘルパーメソッド
+private func extractValue(from html: String, pattern: String) -> String? {
+    do {
+        let regex = try NSRegularExpression(pattern: pattern, options: [.caseInsensitive, .dotMatchesLineSeparators])
+        let nsString = html as NSString
+        let results = regex.matches(in: html, options: [], range: NSRange(location: 0, length: nsString.length))
+        
+        if let match = results.first, match.numberOfRanges > 1 {
+            let range = match.range(at: 1)
+            let extractedValue = nsString.substring(with: range)
+            // HTMLエンティティをデコードして、余分な空白を除去
+            return cleanHTMLString(extractedValue)
+        }
+    } catch {
+        print("正規表現エラー: \(error)")
+    }
+    return nil
+}
+
+// HTMLエンティティのデコードと文字列のクリーンアップ
+private func cleanHTMLString(_ html: String) -> String {
+    return html
+        .replacingOccurrences(of: "&nbsp;", with: " ")
+        .replacingOccurrences(of: "&amp;", with: "&")
+        .replacingOccurrences(of: "&lt;", with: "<")
+        .replacingOccurrences(of: "&gt;", with: ">")
+        .replacingOccurrences(of: "&quot;", with: "\"")
+        .trimmingCharacters(in: .whitespacesAndNewlines)
 }
 
 enum CrawlerError: Error {
