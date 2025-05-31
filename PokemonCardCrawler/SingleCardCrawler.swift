@@ -33,13 +33,36 @@ class SingleCardCrawler {
     
     func crawlSingleCard(url: String, context: NSManagedObjectContext, completion: @escaping (Result<String, Error>) -> Void) {
         
+        // デバッグ: 入力されたURLを確認
+        print("入力されたURL: \(url)")
+        
         guard let url = URL(string: url) else {
             completion(.failure(CrawlerError.invalidURL))
             return
         }
         
+        print("変換後のURL: \(url)")
+        
+        // 試験的にUser-Agentを追加
         // URLSessionでHTTPリクエストを実行
-        URLSession.shared.dataTask(with: url) { data, response, error in
+        var request = URLRequest(url: url)
+        request.setValue("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36", forHTTPHeaderField: "User-Agent")
+        
+        // URLSessionでHTTPリクエストを実行
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            
+            // デバッグ: レスポンス情報を確認
+            if let httpResponse = response as? HTTPURLResponse {
+                print("HTTPステータスコード: \(httpResponse.statusCode)")
+            }
+            
+            if let error = error {
+                print("ネットワークエラー: \(error)")
+                print("エラーの詳細: \(error.localizedDescription)")
+                completion(.failure(error))
+                return
+            }
+            
             if let error = error {
                 completion(.failure(error))
                 return
@@ -169,23 +192,6 @@ class SingleCardCrawler {
         print("弱点: \(weakness)")
         print("抵抗力: \(resistance)")
         print("逃げるコスト: \(retreatCost)")
-        
-        /*
-        return CardInfo(
-            name: name,
-            cardID: cardID,
-            expansion: expansion,
-            hp: hp,
-            cardType: cardType,
-            attack1: attack1,
-            attack2: attack2,
-            // evolution: evolution,
-            rarity: rarity,
-            retreatCost: retreatCost,
-            weakness: weakness,
-            resistance: resistance
-        )
-         */
         
         return CardInfo(
             cardID: cardID,

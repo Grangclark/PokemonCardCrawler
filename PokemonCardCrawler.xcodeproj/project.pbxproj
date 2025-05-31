@@ -48,6 +48,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		6E3A91252DEB9B6000261591 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		6E4A9A842DDB547F00CCE37B /* CardListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardListView.swift; sourceTree = "<group>"; };
 		6E4A9A862DDB59AD00CCE37B /* DeckListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckListView.swift; sourceTree = "<group>"; };
 		6E4CD3782DE802BE00B4A90B /* SingleCardCrawlerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleCardCrawlerView.swift; sourceTree = "<group>"; };
@@ -125,6 +126,7 @@
 		6E7B977A2DC8395B00A519E2 /* PokemonCardCrawler */ = {
 			isa = PBXGroup;
 			children = (
+				6E3A91252DEB9B6000261591 /* Info.plist */,
 				6E7B977B2DC8395B00A519E2 /* PokemonCardCrawlerApp.swift */,
 				6EE92D002DC8EBEE00A5B19D /* NotificationExtensions.swift */,
 				6E7B977D2DC8395B00A519E2 /* ContentView.swift */,
@@ -480,6 +482,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PokemonCardCrawler/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -507,6 +510,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PokemonCardCrawler/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
