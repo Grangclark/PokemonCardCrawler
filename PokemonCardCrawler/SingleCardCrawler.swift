@@ -113,107 +113,8 @@ class SingleCardCrawler {
     }
     
     private func parseCardHTML(_ html: String, url: String) throws -> CardInfo {
-        // HTMLパース処理をここに実装
-        // 既存のクローラーコードを参考に、1枚分の処理を行う
         
-        // カードIDの抽出（例：001/165）
-        let cardIDPattern = #"<span[^>]*class=".*cardNumber.*"[^>]*>(.*?)</span>"#
-        let cardID = extractValue(from: html, pattern: cardIDPattern) ?? "000/000"
-        
-        // カード名の抽出
-        let namePattern = #"<h1[^>]*class=".*cardName.*"[^>]*>(.*?)</h1>"#
-        let name = extractValue(from: html, pattern: namePattern) ?? "不明なカード"
-        
-        // 画像URLの抽出
-        let imageURLPattern = #"<img[^>]*class=".*cardImage.*"[^>]*src="([^"]*)"#
-        let imageURL = extractValue(from: html, pattern: imageURLPattern) ?? ""
-
-        // pageURLは引数として渡されたURLをそのまま使用
-        // let pageURL = url // crawlSingleCard関数の引数として渡されたURL
-        
-        // 拡張パック名の抽出
-        let expansionPattern = #"<span[^>]*class=".*expansionPack.*"[^>]*>(.*?)</span>"#
-        let expansion = extractValue(from: html, pattern: expansionPattern) ?? "不明な拡張パック"
-        
-        // レアリティの抽出
-        let rarityPattern = #"<span[^>]*class=".*rarity.*"[^>]*>(.*?)</span>"#
-        let rarity = extractValue(from: html, pattern: rarityPattern) ?? ""
-        
-        // タイプの抽出
-        let typePattern = #"<span[^>]*class=".*type.*"[^>]*>(.*?)</span>"#
-        let cardType = extractValue(from: html, pattern: typePattern) ?? "ノーマル"
-        
-        // HPの抽出
-        let hpPattern = #"<span[^>]*class=".*hp.*"[^>]*>.*?(\d+)</span>"#
-        let hpString = extractValue(from: html, pattern: hpPattern) ?? "0"
-        let hp = Int(hpString) ?? 0
-        
-        // 技1の抽出
-        let attack1Pattern = #"<div[^>]*class=".*attack.*"[^>]*>.*?<span[^>]*class=".*attackName.*"[^>]*>(.*?)</span>"#
-        let attack1 = extractValue(from: html, pattern: attack1Pattern) ?? ""
-        
-        // 技2の抽出（複数の技がある場合）
-        let attack2Pattern = #"<div[^>]*class=".*attack.*"[^>]*>.*?<div[^>]*class=".*attack.*"[^>]*>.*?<span[^>]*class=".*attackName.*"[^>]*>(.*?)</span>"#
-        let attack2 = extractValue(from: html, pattern: attack2Pattern) ?? ""
-        
-        // 特性の抽出
-        let abilityPattern = #"<span[^>]*class=".*ability.*"[^>]*>(.*?)</span>"#
-        let ability = extractValue(from: html, pattern: abilityPattern) ?? ""
-        
-        // 弱点の抽出
-        let weaknessPattern = #"<span[^>]*class=".*weakness.*"[^>]*>(.*?)</span>"#
-        let weakness = extractValue(from: html, pattern: weaknessPattern) ?? ""
-        
-        // 抵抗力の抽出
-        let resistancePattern = #"<span[^>]*class=".*resistance.*"[^>]*>(.*?)</span>"#
-        let resistance = extractValue(from: html, pattern: resistancePattern) ?? ""
-        
-        // 逃げるエネルギーの抽出
-        let retreatPattern = #"<span[^>]*class=".*retreat.*"[^>]*>.*?(\d+)"#
-        let retreatString = extractValue(from: html, pattern: retreatPattern) ?? "0"
-        let retreatCost = Int(retreatString) ?? 0
-        
-        /*
-        // 進化段階の抽出
-        let evolutionPattern = #"<span[^>]*class=".*evolution.*"[^>]*>(.*?)</span>"#
-        let evolution = extractValue(from: html, pattern: evolutionPattern) ?? ""
-        */
-
-        print("パース結果:")
-        print("カードID: \(cardID)")
-        print("名前: \(name)")
-        print("拡張パック: \(expansion)")
-        print("レアリティ: \(rarity)")
-        print("タイプ: \(cardType)")
-        print("HP: \(hp)")
-        print("技1: \(attack1)")
-        print("技2: \(attack2)")
-        print("特性: \(ability)")
-        print("弱点: \(weakness)")
-        print("抵抗力: \(resistance)")
-        print("逃げるコスト: \(retreatCost)")
-        
-        return CardInfo(
-            cardID: cardID,
-            name: name,
-            imageURL: imageURL,
-            pageURL: url, // 引数として受け取ったURLを設定
-            expansion: expansion,
-            rarity: rarity,
-            cardType: cardType,
-            hp: hp,
-            attack1: attack1,
-            attack2: attack2,
-            ability: ability,
-            weakness: weakness,
-            resistance: resistance,
-            retreatCost: retreatCost
-        )
-        
-        // HTMLから必要な情報を抽出する処理
-        // 正規表現やSwiftSoupを使用してパース
-        
-        /*
+         /*
          // サンプルなので消すな
         return CardInfo(
             cardID: "033/106",
@@ -232,6 +133,62 @@ class SingleCardCrawler {
             retreatCost: 1
         )
          */
+        
+        print("=== HTMLパース開始 ===")
+            
+        // Phase 1: 確実に取得できる基本情報のみ
+            
+        // 1. カード名
+        let namePattern = #"<h1[^>]*class="Heading1[^"]*"[^>]*>(.*?)</h1>"#
+        let name = extractValue(from: html, pattern: namePattern) ?? "不明なカード"
+        print("カード名: \(name)")
+        
+        // 2. HP
+        let hpPattern = #"<span[^>]*class="hp-num"[^>]*>(\d+)</span>"#
+        let hpString = extractValue(from: html, pattern: hpPattern) ?? "0"
+        let hp = Int(hpString) ?? 0
+        print("HP: \(hp)")
+        
+        // 3. 進化段階（一時的にコメントアウト - Core Dataにフィールドなし）
+        // let evolutionPattern = #"<span[^>]*class="type"[^>]*>(.*?)</span>"#
+        // let evolution = extractValue(from: html, pattern: evolutionPattern) ?? ""
+        // print("進化段階: \(evolution)")
+        
+        // 4. 特性名
+        let abilityPattern = #"<h2[^>]*>特性</h2>\s*<h4[^>]*>(.*?)</h4>"#
+        let ability = extractValue(from: html, pattern: abilityPattern) ?? ""
+        print("特性: \(ability)")
+        
+        // 5. 技名（アイコンタグを除いて技名のみ抽出）
+        let attackPattern = #"<h2[^>]*>ワザ</h2>\s*<h4[^>]*>.*?</span>([^<]+)<span[^>]*f_right"#
+        let rawAttack = extractValue(from: html, pattern: attackPattern) ?? ""
+        let attack1 = rawAttack.trimmingCharacters(in: .whitespacesAndNewlines)
+        print("技1: \(attack1)")
+        
+        // 6. 画像URL
+        let imagePattern = #"<img[^>]*class="fit"[^>]*src="([^"]*)"#
+        let imageURL = extractValue(from: html, pattern: imagePattern) ?? ""
+        print("画像URL: \(imageURL)")
+        
+        print("=== HTMLパース完了 ===")
+        
+        // 難しい情報は全て固定値またはコメントアウト
+        return CardInfo(
+            cardID: "Phase2で実装予定", // Phase 2で実装
+            name: name,
+            imageURL: imageURL,
+            pageURL: url,
+            expansion: "Phase2で実装予定", // Phase 2で実装
+            rarity: "Phase3で実装予定", // Phase 3で実装（アイコン処理）
+            cardType: "Phase3で実装予定", // Phase 3で実装（アイコン処理）
+            hp: hp,
+            attack1: attack1,
+            attack2: "", // Phase 2で複数技対応
+            ability: ability,
+            weakness: "Phase3で実装予定", // Phase 3で実装（アイコン処理）
+            resistance: "Phase3で実装予定", // Phase 3で実装（アイコン処理）
+            retreatCost: 0 // Phase 3で実装（アイコン処理）
+        )
     }
 }
 
