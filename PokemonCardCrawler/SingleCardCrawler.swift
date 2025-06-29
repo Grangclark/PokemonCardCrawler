@@ -159,32 +159,55 @@ class SingleCardCrawler {
         let ability = extractValue(from: html, pattern: abilityPattern) ?? ""
         print("特性: \(ability)")
         
+        /*
         // 5. 技名（アイコンタグを除いて技名のみ抽出）
         let attackPattern = #"<h2[^>]*>ワザ</h2>\s*<h4[^>]*>.*?</span>([^<]+)<span[^>]*f_right"#
         let rawAttack = extractValue(from: html, pattern: attackPattern) ?? ""
         let attack1 = rawAttack.trimmingCharacters(in: .whitespacesAndNewlines)
         print("技1: \(attack1)")
-        
+        */
+         
         // 6. 画像URL
         let imagePattern = #"<img[^>]*class="fit"[^>]*src="([^"]*)"#
         let imageURL = extractValue(from: html, pattern: imagePattern) ?? ""
         print("画像URL: \(imageURL)")
         
+        // ===== Phase 2: 新規実装 =====
+        
+        // 7. CardID（122/106形式の特殊文字処理）
+        let cardIDPattern = #"&nbsp;(\d+)&nbsp;/&nbsp;(\d+)&nbsp;"#
+        let cardID = extractCardID(from: html)
+        print("カードID: \(cardID)")
+        
+        // 8. 拡張パック名（SV8の抽出）
+        let expansionPattern = #"src="/assets/images/card/regulation_logo_1/([^\.]+)\.gif""#
+        let expansion = extractValue(from: html, pattern: expansionPattern) ?? ""
+        print("拡張パック: \(expansion)")
+        
+        // 9. 技1（アイコンタグを除いて技名のみ抽出 + ダメージ）
+        let (attack1Name, attack1Damage) = extractAttackInfo(from: html, attackNumber: 1)
+        let attack1Final = attack1Damage > 0 ? "\(attack1Name)(\(attack1Damage))" : attack1Name
+        print("技1: \(attack1Final)")
+        
+        // 10. 技2（複数技への対応）
+        let (attack2Name, attack2Damage) = extractAttackInfo(from: html, attackNumber: 2)
+        let attack2Final = attack2Damage > 0 ? "\(attack2Name)(\(attack2Damage))" : attack2Name
+        print("技2: \(attack2Final)")
+        
         print("=== HTMLパース完了 ===")
         
-        // 難しい情報は全て固定値またはコメントアウト
         return CardInfo(
-            cardID: "Phase2で実装予定", // Phase 2で実装
+            cardID: cardID,
             name: name,
             imageURL: imageURL,
             pageURL: url,
-            expansion: "Phase2で実装予定", // Phase 2で実装
+            expansion: expansion.isEmpty ? nil : expansion,
             rarity: "Phase3で実装予定", // Phase 3で実装（アイコン処理）
             cardType: "Phase3で実装予定", // Phase 3で実装（アイコン処理）
-            hp: hp,
-            attack1: attack1,
-            attack2: "", // Phase 2で複数技対応
-            ability: ability,
+            hp: hp > 0 ? hp : nil,
+            attack1: attack1Final.isEmpty ? nil : attack1Final,
+            attack2: attack2Final.isEmpty ? nil : attack2Final,
+            ability: ability.isEmpty ? nil : ability,
             weakness: "Phase3で実装予定", // Phase 3で実装（アイコン処理）
             resistance: "Phase3で実装予定", // Phase 3で実装（アイコン処理）
             retreatCost: 0 // Phase 3で実装（アイコン処理）
@@ -220,6 +243,81 @@ private func cleanHTMLString(_ html: String) -> String {
         .replacingOccurrences(of: "&gt;", with: ">")
         .replacingOccurrences(of: "&quot;", with: "\"")
         .trimmingCharacters(in: .whitespacesAndNewlines)
+}
+
+// MARK: - Phase 2 新規ヘルパーメソッド
+
+// CardID抽出（特殊文字&nbsp;の処理）
+private func extractCardID(from html: String) -> String {
+    let pattern = #"&nbsp;(\d+)&nbsp;/&nbsp;(\d+)&nbsp;"#
+    do {
+        let regex = try NSRegularExpression(pattern: pattern, options: [.caseInsensitive])
+        let nsString = html as NSString
+        let results = regex.matches(in: html, options: [], range: NSRange(location: 0, length: nsString.length))
+        
+        if let match = results.first, match.numberOfRanges >= 3 {
+            let firstNumber = nsString.substring(with: match.range(at: 1))
+            let secondNumber = nsString.substring(with: match.range(at: 2))
+            return "\(firstNumber)/\(secondNumber)"
+        }
+    } catch {
+        print("CardID抽出エラー: \(error)")
+    }
+    return ""
+}
+
+// 技の情報抽出（技名 + ダメージ）
+private func extractAttackInfo(from html: String, attackNumber: Int) -> (name: String, damage: Int) {
+    // まず全ての技のh4タグを抽出
+    let allAttacksPattern = #"<h2[^>]*>ワザ</h2>(.*?)(?=<h2|<table|$)"#
+    
+    guard let attacksSection = extractValue(from: html, pattern: allAttacksPattern) else {
+        return ("", 0)
+    }
+    
+    // 技のh4タグを個別に抽出
+    let individualAttackPattern = #"<h4[^>]*>(.*?)</h4>"#
+    let attackMatches = extractAllMatches(from: attacksSection, pattern: individualAttackPattern)
+    
+    // 指定された番号の技を取得
+    guard attackNumber <= attackMatches.count, attackNumber > 0 else {
+        return ("", 0)
+    }
+    
+    let attackHTML = attackMatches[attackNumber - 1]
+    
+    // 技名の抽出（アイコンを除去）
+    let namePattern = #"</span>([^<]+)<span[^>]*f_right"#
+    let attackName = extractValue(from: attackHTML, pattern: namePattern)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    
+    // ダメージの抽出
+    let damagePattern = #"<span[^>]*f_right[^>]*>(\d+)</span>"#
+    let damageString = extractValue(from: attackHTML, pattern: damagePattern) ?? "0"
+    let damage = Int(damageString) ?? 0
+    
+    return (attackName, damage)
+}
+
+// 複数のマッチを抽出するヘルパーメソッド
+private func extractAllMatches(from text: String, pattern: String) -> [String] {
+    var matches: [String] = []
+    
+    do {
+        let regex = try NSRegularExpression(pattern: pattern, options: [.caseInsensitive, .dotMatchesLineSeparators])
+        let nsString = text as NSString
+        let results = regex.matches(in: text, options: [], range: NSRange(location: 0, length: nsString.length))
+        
+        for match in results {
+            if match.numberOfRanges > 1 {
+                let matchedString = nsString.substring(with: match.range(at: 1))
+                matches.append(matchedString)
+            }
+        }
+    } catch {
+        print("複数マッチ抽出エラー: \(error)")
+    }
+    
+    return matches
 }
 
 enum CrawlerError: Error {
