@@ -11,7 +11,6 @@ import CoreData
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
     
-    @StateObject private var crawlerViewModel = CrawlerViewModel()
     @State private var searchText = ""
     @State private var selectedTab = 0
     
@@ -46,15 +45,6 @@ struct ContentView: View {
                 }
                 .searchable(text: $searchText, prompt: "カード名で検索")
                 .navigationTitle("カードデータベース")
-                .toolbar {
-                    ToolbarItem {
-                        Button(action: {
-                            crawlerViewModel.startCrawling()
-                        }) {
-                            Label("クローリング開始", systemImage: "arrow.clockwise")
-                        }
-                    }
-                }
                 
                 Text("カードを選択してください")
                     .foregroundColor(.secondary)
@@ -78,42 +68,10 @@ struct ContentView: View {
                 }
                 .tag(2)
         }
-        .overlay(
-            ZStack {
-                if crawlerViewModel.isLoading {
-                    Color.black.opacity(0.3)
-                        .edgesIgnoringSafeArea(.all)
-                    
-                    VStack {
-                        ProgressView()
-                            .scaleEffect(1.5)
-                            .padding()
-                        
-                        Text("クローリング中: \(crawlerViewModel.progress)/\(crawlerViewModel.totalItems)")
-                            .font(.headline)
-                            .padding()
-                        
-                        Button("キャンセル") {
-                            crawlerViewModel.cancelCrawling()
-                        }
-                        .buttonStyle(.bordered)
-                    }
-                    .padding(30)
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(Color(.windowBackgroundColor))
-                            .shadow(radius: 10)
-                    )
-                }
-            }
-        )
+
         .onAppear {
-            setupNotifications()
             // アプリ起動時に初期データ確認
             checkAndInsertInitialData()
-        }
-        .onDisappear {
-            removeNotifications()
         }
         .frame(minWidth: 800, minHeight: 600)
     }
@@ -124,39 +82,6 @@ struct ContentView: View {
         if cards.isEmpty {
             print("初期データがありません。サンプルデータを挿入します。")
             PersistenceController.shared.insertSampleDataIfNeeded()
-        }
-    }
-    
-    private func setupNotifications() {
-        NotificationCenter.default.addObserver(
-            forName: .startCrawling,
-            object: nil,
-            queue: .main) { _ in
-                crawlerViewModel.startCrawling()
-            }
-        
-        NotificationCenter.default.addObserver(
-            forName: .clearDatabase,
-            object: nil,
-            queue: .main) { _ in
-                deleteAllCards()
-            }
-    }
-    
-    private func removeNotifications() {
-        NotificationCenter.default.removeObserver(self, name: .startCrawling, object: nil)
-        NotificationCenter.default.removeObserver(self, name: .clearDatabase, object: nil)
-    }
-    
-    private func deleteAllCards() {
-        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = CDPokemonCard.fetchRequest()
-        let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-        
-        do {
-            try viewContext.execute(batchDeleteRequest)
-            try viewContext.save()
-        } catch {
-            print("Error deleting cards: \(error)")
         }
     }
 }
