@@ -54,7 +54,6 @@ struct CardRowView: View {
     }
     
     private func loadCardImage() {
-        // guard cardImage == nil, let imageURL = card.imageURL, let url = URL(string: imageURL) else {
         guard cardImage == nil, !card.imageURL.isEmpty, let url = URL(string: card.imageURL) else {
             return
         }

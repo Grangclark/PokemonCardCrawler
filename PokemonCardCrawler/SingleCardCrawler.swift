@@ -154,13 +154,6 @@ class SingleCardCrawler {
         let ability = extractValue(from: html, pattern: abilityPattern) ?? ""
         print("特性: \(ability)")
         
-        /*
-        // 4. 画像URL
-        let imagePattern = #"<img[^>]*class="fit"[^>]*src="([^"]*)"#
-        let imageURL = extractValue(from: html, pattern: imagePattern) ?? ""
-        print("画像URL: \(imageURL)")
-        */
-        
         // 4. 画像URL（完全URL化）
         let imagePattern = #"<img[^>]*class="fit"[^>]*src="([^"]*)"#
         let relativeImageURL = extractValue(from: html, pattern: imagePattern) ?? ""

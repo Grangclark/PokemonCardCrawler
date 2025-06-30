@@ -11,6 +11,8 @@ import CoreData
 struct CardDetailView: View {
     let card: PokemonCardCrawler.CDPokemonCard
     @State private var cardImage: NSImage?
+    @Environment(\.managedObjectContext) private var viewContext // add
+    @Environment(\.dismiss) private var dismiss // add
     
     var body: some View {
         ScrollView {
@@ -85,9 +87,16 @@ struct CardDetailView: View {
                         }
                     }
                     
-                    if let pageURL = card.pageURL {
-                        Link("公式サイトで見る", destination: URL(string: pageURL)!)
+                    if let pageURL = card.pageURL, let url = URL(string: pageURL) {
+                        Link("公式サイトで見る", destination: url)
                             .padding(.top, 10)
+                    }
+                }
+                .toolbar {
+                    ToolbarItem(placement: .destructiveAction) {
+                        Button("削除", role: .destructive) {
+                            deleteCard()
+                        }
                     }
                 }
                 .padding()
@@ -123,5 +132,26 @@ struct CardDetailView: View {
                 }
             }
         }.resume()
+    }
+    
+    private func deleteCard() {
+        let alert = NSAlert()
+        alert.messageText = "カードを削除"
+        alert.informativeText = "「\(card.name)」を削除しますか？"
+        alert.addButton(withTitle: "削除")
+        alert.addButton(withTitle: "キャンセル")
+        alert.alertStyle = .warning
+        
+        let response = alert.runModal()
+        if response == .alertFirstButtonReturn {
+            viewContext.delete(card)
+            
+            do {
+                try viewContext.save()
+                // dismiss() は不要！
+            } catch {
+                print("削除エラー: \(error)")
+            }
+        }
     }
 }
