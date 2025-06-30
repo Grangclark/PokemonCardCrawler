@@ -54,19 +54,12 @@ struct ContentView: View {
             }
             .tag(0)
             
-            // デッキビュータブ
-            DeckView()
-                .tabItem {
-                    Label("デッキ", systemImage: "list.bullet")
-                }
-                .tag(1)
-            
             // 新しいタブを追加
             SingleCardCrawlerView()
                 .tabItem {
                     Label("カード追加", systemImage: "plus.circle")
                 }
-                .tag(2)
+                .tag(1)
         }
 
         .onAppear {

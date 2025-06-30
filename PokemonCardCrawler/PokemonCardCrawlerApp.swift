@@ -27,27 +27,6 @@ struct PokemonCardCrawlerApp: App {
                 }
         }
         .windowStyle(HiddenTitleBarWindowStyle())
-        .commands {
-            CommandGroup(replacing: .newItem) {
-                Button("クローリング開始") {
-                    NotificationCenter.default.post(name: .startCrawling, object: nil)
-                }
-                .keyboardShortcut("R", modifiers: [.command, .shift])
-                
-                Button("データベースをクリア") {
-                    NotificationCenter.default.post(name: .clearDatabase, object: nil)
-                }
-                .keyboardShortcut("K", modifiers: [.command, .shift])
-                
-                Divider()
-                
-                Button("デッキコードで検索") {
-                    // タブを切り替える
-                    NotificationCenter.default.post(name: .switchToDeckTab, object: nil)
-                }
-                .keyboardShortcut("D", modifiers: [.command])
-            }
-        }
     }
 }
 
